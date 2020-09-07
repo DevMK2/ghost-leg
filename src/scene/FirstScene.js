@@ -17,27 +17,23 @@ export class FirstScene extends Phaser.Scene {
     this.add.text(240, 450, 'Normal', { fill: '#ffffff' })
       .setFontSize(40)
       .setInteractive()
-      .on('pointerover', () => {
-        console.log('normal over');
+      .on('pointerdown', () => this.scene.start('MainScene'))
+      .on('pointerover', function() {
+        this.setScale(1.1);
       })
-      .on('pointerout', () => {
-        console.log('normal out');
-      })
-      .on('pointerdown', () => {
-        this.scene.start('MainScene');
+      .on('pointerout', function() {
+        this.setScale(0.9);
       });
 
     this.add.text(240, 550, 'Expert', { fill: '#ffffff' })
       .setFontSize(40)
       .setInteractive()
-      .on('pointerover', () => {
-        console.log('expert over');
+      .on('pointerdown', () => this.scene.start('MainScene'))
+      .on('pointerover', function() {
+        this.setScale(1.1);
       })
-      .on('pointerout', () => {
-        console.log('expert out');
-      })
-      .on('pointerdown', () => {
-        this.scene.start('MainScene');
+      .on('pointerout', function() {
+        this.setScale(0.9);
       });
   }
 

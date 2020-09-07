@@ -76,21 +76,19 @@ export class MainScene extends Phaser.Scene {
   }
 
   createStartPoints() {
-    let text1 = this.add.text(70, 730, "Start1").setInteractive().on('pointerdown', () => {
-      this.launchRocket(1);
-    });
-    let text2 = this.add.text(170, 730, "Start2").setInteractive().on('pointerdown', () => {
-      this.launchRocket(2);
-    });
-    let text3 = this.add.text(270, 730, "Start3").setInteractive().on('pointerdown', () => {
-      this.launchRocket(3);
-    });
-    let text4 = this.add.text(370, 730, "Start4").setInteractive().on('pointerdown', () => {
-      this.launchRocket(4);
-    });
-    let text5 = this.add.text(470, 730, "Start5").setInteractive().on('pointerdown', () => {
-      this.launchRocket(5);
-    });
+    for(let i=0; i<5; ++i) {
+      const pos = { x : 100 * i + 70, y : 730 };
+
+      this.add.text(pos.x, pos.y, `Start${i+1}`)
+        .setInteractive()
+        .on('pointerdown', () => this.launchRocket(i+1))
+        .on('pointerover', function() {
+          this.setScale(1.1);
+        })
+        .on('pointerout', function() {
+          this.setScale(0.9);
+        });
+    }
   }
 
   getPath() {
