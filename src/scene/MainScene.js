@@ -1,7 +1,6 @@
-import { strategy } from "webpack-merge";
+import { backgroundMain, rocket } from '../assets';
 
 export class MainScene extends Phaser.Scene {
-  
   constructor ()
   {
       super('MainScene');
@@ -16,12 +15,13 @@ export class MainScene extends Phaser.Scene {
   }
 
   preload() {
-    this.load.image('nebula', 'src/assets/nebula.jpg');
-    this.load.image("rocket", 'src/assets/ship.png');
+    this.load.image('bgMain', backgroundMain);
+    this.load.image("rocket", rocket);
+    console.log(rocket);
   }
 
   create() {
-    this.add.image(400, 500, 'nebula');
+    this.add.image(400, 500, 'bgMain');
 
     this.graphics = this.add.graphics({ lineStyle: { color: 0x00ffff } });
     this.tent = new Phaser.Geom.Rectangle(50, 150, 500, 500);

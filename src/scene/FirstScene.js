@@ -1,3 +1,5 @@
+import { backgroundMenu, logo } from '../assets';
+
 export class FirstScene extends Phaser.Scene {
 
   constructor ()
@@ -6,12 +8,12 @@ export class FirstScene extends Phaser.Scene {
   }
 
   preload() {
-    this.load.image('space', 'src/assets/space3.png');
-    this.load.image('logo', 'src/assets/phaser2.png')
+    this.load.image('bgMenu', backgroundMenu);
+    this.load.image('logo', logo)
   }
 
   create() {
-    this.add.image(400, 500, 'space');
+    this.add.image(400, 500, 'bgMenu');
     this.add.image(310, 220,'logo');
 
     this.add.text(240, 450, 'Normal', { fill: '#ffffff' })
