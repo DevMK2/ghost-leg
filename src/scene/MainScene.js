@@ -17,9 +17,7 @@ export class MainScene extends Phaser.Scene {
 
   preload() {
     this.load.image('nebula', 'src/assets/nebula.jpg');
-    this.load.image("rocket", "http://labs.phaser.io/assets/sprites/ship.png");
-
-    //this.load.image('rocket', 'src/assets/rocket.png');
+    this.load.image("rocket", 'src/assets/ship.png');
   }
 
   create() {
