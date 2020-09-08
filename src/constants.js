@@ -2,8 +2,8 @@
 export const ROW = 5;
 export const COL = 3;
 
-export const LADDER_MARGIN = 100;
-export const LADDER_HEIGHT = 600;
+export const LADDER_MARGIN = 200;
+export const LADDER_HEIGHT = 500;
 export const LADDER_WIDTH = 600;
 
 export const LADDER_HGAP = LADDER_HEIGHT / (ROW + 1);
@@ -23,4 +23,6 @@ export const ASSETS_KEY = {
     rocket: 'ROCKET',
     blind: 'BLIND',
     flame: 'FLAME',
+    destination: ['DESTINATION_1', 'DESTINATION_2', 'DESTINATION_3'],
+    starting: ['STARTING_1', 'STARTING_2', 'STARTING_3'],
 };

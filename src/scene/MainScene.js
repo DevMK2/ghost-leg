@@ -1,4 +1,4 @@
-import { background, rocket, blind, buttonStart, flame } from '../assets';
+import { background, rocket, blind, buttonStart, flame, destination1, destination2, destination3, starting1, starting2, starting3 } from '../assets';
 import { 
     NORMAL_MODE, EXPERT_MODE,
     ROW, COL,
@@ -36,22 +36,37 @@ export class MainScene extends Phaser.Scene {
         this.load.image(assetKey.rocket, rocket);
         this.load.image(assetKey.blind, blind);
         this.load.image(assetKey.buttonStart, buttonStart);
+        this.load.image(assetKey.destination[0], destination1);
+        this.load.image(assetKey.destination[1], destination2);
+        this.load.image(assetKey.destination[2], destination3);
+        this.load.image(assetKey.starting[0], starting1);
+        this.load.image(assetKey.starting[1], starting2);
+        this.load.image(assetKey.starting[2], starting3);
         this.load.spritesheet(assetKey.flame, flame, { frameWidth: 14, frameHeight: 71, spacing: 14 }); 
     }
 
     create() {
-        this.add.image(400, 500, assetKey.background);
+        let background = this.add.image(300, 400, assetKey.background);
+        this.add.tween({
+            targets: background,
+            x: -100,
+            ease: 'Sine.easeInOut',
+            duration: 10000,
+            repeat: -1,
+            yoyo: true
+        });
 
         this.graphics = this.add.graphics({ lineStyle: { color: 0xffffff } });
 
         this.createPathes();
         this.createBlind();
         this.createStartPoints();
+        this.createDestinationPoints();
     }
 
     update(time, delta) {
         if(this.flame) {
-            if(Math.abs(this.lasttime - time) > 16) {
+            if(Math.abs(this.lasttime - time) > 50) {
                 this.flame.setFrame(this.flameindex++ % 3);
                 this.lasttime = time;
             }
@@ -102,12 +117,13 @@ export class MainScene extends Phaser.Scene {
             this.lines.push(new Phaser.Geom.Line(from.x, from.y, to.x, to.y));
         }
 
+        this.graphics.lineGradientStyle(15, 0x00fffff, 0xffffff, 0xffffff, 0x00ffff, 1);
         this.lines.forEach(line=>this.graphics.strokeLineShape(line));
     }
 
     createBlind() {
-        this.blind = this.add.image(300, 400, assetKey.blind);
-        this.startButton = this.add.image(300, 400, assetKey.buttonStart)
+        this.blind = this.add.image(300, 450, assetKey.blind);
+        this.startButton = this.add.image(300, 450, assetKey.buttonStart)
             .setInteractive()
             .on('pointerdown', () => this.launchRocket())
             .on('pointerover', function() {
@@ -126,11 +142,11 @@ export class MainScene extends Phaser.Scene {
     createStartPoints() {
         for(let i=0; i<COL; ++i) {
             const pos = {
-                x : LADDER_WGAP * (i + 1) - 30, 
+                x : LADDER_WGAP * (i + 1), 
                 y : LADDER_MARGIN + LADDER_HEIGHT + 30
             };
 
-            this.add.text(pos.x, pos.y, `Start${i+1}`)
+            this.add.image(pos.x, pos.y, assetKey.starting[i])
                 .setInteractive()
                 .on('pointerdown', () => this.setRocket(i, pos.x, pos.y))
                 .on('pointerover', function() {
@@ -139,6 +155,17 @@ export class MainScene extends Phaser.Scene {
                 .on('pointerout', function() {
                     this.setScale(0.9);
                 });
+        }
+    }
+
+    createDestinationPoints() {
+        for(let i=0; i<COL; ++i) {
+            const pos = {
+                x : LADDER_WGAP * (i + 1), 
+                y : LADDER_MARGIN - 30
+            };
+
+            this.add.image(pos.x, pos.y, assetKey.destination[i]);
         }
     }
 
@@ -152,7 +179,7 @@ export class MainScene extends Phaser.Scene {
         }
 
         this.selected = index + 1;
-        this.rocket = this.add.image(x+30, y+20, assetKey.rocket);
+        this.rocket = this.add.image(x, y, assetKey.rocket);
     }
 
     launchRocket() {
