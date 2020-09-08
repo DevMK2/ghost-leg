@@ -14,7 +14,7 @@ export class FirstScene extends Phaser.Scene {
 
   create() {
     this.add.image(400, 500, 'bgMenu');
-    this.add.image(310, 220,'logo');
+    this.add.image(310, 220, 'logo');
 
     this.add.text(240, 450, 'Normal', { fill: '#ffffff' })
       .setFontSize(40)

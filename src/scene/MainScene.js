@@ -1,4 +1,4 @@
-import { backgroundMain, rocket } from '../assets';
+import { backgroundMain, rocket, blind } from '../assets';
 
 export class MainScene extends Phaser.Scene {
   constructor ()
@@ -12,43 +12,34 @@ export class MainScene extends Phaser.Scene {
       this.lines = [];
 
       this.selected = 0;
+    this.start = false;
   }
 
   preload() {
     this.load.image('bgMain', backgroundMain);
-    this.load.image("rocket", rocket);
-    console.log(rocket);
+    this.load.image('rocket', rocket);
+    this.load.image('blind', blind);
   }
 
   create() {
     this.add.image(400, 500, 'bgMain');
 
-    this.graphics = this.add.graphics({ lineStyle: { color: 0x00ffff } });
-    this.tent = new Phaser.Geom.Rectangle(50, 150, 500, 500);
+    this.graphics = this.add.graphics({ lineStyle: { color: 0xffffff } });
 
     this.createPathes();
+    this.createBlind();
     this.createStartPoints();
   }
 
   update(time, delta) {
-    this.graphics.clear();
-    this.graphics.lineStyle(1, 0xffffff, 1);
-
-    if (this.selected && this.rocket.z < 1) {
-      var t = this.rocket.z;
-      var vec = this.rocket.getData('vector');
+    if (this.start && this.rocket.z < 1) {
+      const t = this.rocket.z;
+      const vec = this.rocket.getData('vector');
       this.path.getPoint(t, vec);
       this.rocket.setPosition(vec.x, vec.y);
     } else if (this.rocket && this.rocket.z == 1) {
       alert('광고 보기');
       this.scene.start('PrizeScene');
-    }
-
-    this.lines.forEach(line=>this.graphics.strokeLineShape(line));
-
-    if (this.selected == 0) {
-      this.graphics.fillStyle(0x00ff00, 1);
-      this.graphics.fillRectShape(this.tent);
     }
   }
 
@@ -58,10 +49,9 @@ export class MainScene extends Phaser.Scene {
   createPathes() {
     let hgap = 500 / this.rows + 1;
 
-    for (var i = 0; i < this.rows; i++) {
+    for (let i = 0; i < this.rows; i++) {
       let leg = Phaser.Math.Between(1, this.cols - 1);
       this.layers[i] = leg;
-      console.log(leg);
 
       let path = new Phaser.Geom.Line((leg * 100), 100 + hgap * (i + 1), (leg * 100) + 100, 100 + hgap * (i + 1));
       this.lines.push(path);
@@ -73,6 +63,27 @@ export class MainScene extends Phaser.Scene {
     let path4 = new Phaser.Geom.Line(400, 100, 400, 700);
     let path5 = new Phaser.Geom.Line(500, 100, 500, 700);
     this.lines.push(path1, path2, path3, path4, path5);
+
+    this.lines.forEach(line=>this.graphics.strokeLineShape(line));
+  }
+
+  createBlind() {
+    this.blind = this.add.image(300, 400, 'blind').setScale(10, 11);
+    this.startButton = this.add.text(220, 400, `Start`, { fill: '#000000' })
+      .setFontSize(50)
+      .setInteractive()
+      .on('pointerdown', () => this.launchRocket())
+      .on('pointerover', function() {
+        this.setScale(1.1);
+      })
+      .on('pointerout', function() {
+        this.setScale(0.9);
+      });
+  }
+
+  removeBlind() {
+    this.blind.destroy();
+    this.startButton.destroy();
   }
 
   createStartPoints() {
@@ -81,7 +92,7 @@ export class MainScene extends Phaser.Scene {
 
       this.add.text(pos.x, pos.y, `Start${i+1}`)
         .setInteractive()
-        .on('pointerdown', () => this.launchRocket(i+1))
+        .on('pointerdown', () => this.setRocket(i, pos.x, pos.y))
         .on('pointerover', function() {
           this.setScale(1.1);
         })
@@ -114,12 +125,17 @@ export class MainScene extends Phaser.Scene {
     return path;
   }
 
-  launchRocket(index) {
-    if (this.selected > 0)
-        return;
+  setRocket(index, x, y) {
+    if(this.rocket) {
+      this.rocket.destroy();
+    }
+    this.selected = index + 1;
+    this.rocket = this.add.image(x+30, y+30, 'rocket');
+  }
 
-    this.rocket = this.add.image(100, 100, 'rocket');
-    this.selected = index;
+  launchRocket() {
+    this.removeBlind();
+
     this.path = this.getPath();
     this.rocket.setData('vector', new Phaser.Math.Vector2());
 
@@ -132,5 +148,7 @@ export class MainScene extends Phaser.Scene {
       yoyo: false,
       delay: 100
     });
+
+    this.start = true;
   }
 }

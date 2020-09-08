@@ -7,7 +7,10 @@ const config = {
   parent: "ghost-leg",
   width: 600,
   height: 800,
-  scene: [ FirstScene, MainScene ]
+  scene: [ 
+    FirstScene, 
+    MainScene,
+  ]
 };
 
 const game = new Phaser.Game(config);
