@@ -5,6 +5,8 @@ import rocket from './ship.png';
 import blind from './blind.png';
 import background from './background.png';
 import frame from './frame.png';
+import buttonNormal from './button_normal.png';
+import buttonExpert from './button_expert.png';
 
 export { 
   logo,
@@ -13,5 +15,7 @@ export {
   background,
   blind,
   rocket,
-  frame
+  frame,
+  buttonNormal,
+  buttonExpert
 };
