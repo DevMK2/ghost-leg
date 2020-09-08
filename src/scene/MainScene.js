@@ -1,4 +1,4 @@
-import { background, rocket, bind } from '../assets';
+import { background, rocket, blind } from '../assets';
 
 export class MainScene extends Phaser.Scene {
   constructor ()
