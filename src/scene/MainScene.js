@@ -1,4 +1,4 @@
-import { background, rocket, blind, buttonStart } from '../assets';
+import { background, rocket, blind, buttonStart, flame } from '../assets';
 import { 
     NORMAL_MODE, EXPERT_MODE,
     ROW, COL,
@@ -36,6 +36,7 @@ export class MainScene extends Phaser.Scene {
         this.load.image(assetKey.rocket, rocket);
         this.load.image(assetKey.blind, blind);
         this.load.image(assetKey.buttonStart, buttonStart);
+        this.load.spritesheet(assetKey.flame, flame, { frameWidth: 14, frameHeight: 71, spacing: 14 }); 
     }
 
     create() {
@@ -49,13 +50,22 @@ export class MainScene extends Phaser.Scene {
     }
 
     update(time, delta) {
+        if(this.flame) {
+            if(Math.abs(this.lasttime - time) > 16) {
+                this.flame.setFrame(this.flameindex++ % 3);
+                this.lasttime = time;
+            }
+        }
+
         if (this.start && this.rocket.z < 1) {
             const t = this.rocket.z;
             const vec = this.rocket.getData('vector');
             this.path.getPoint(t, vec);
             this.rocket.setPosition(vec.x, vec.y);
+            this.flame.setPosition(vec.x, vec.y + 70);
         } else if (this.rocket && this.rocket.z == 1) {
             console.log('광고 보기');
+            this.flame.destroy();
             //this.scene.start('PrizeScene');
         }
     }
@@ -163,6 +173,10 @@ export class MainScene extends Phaser.Scene {
             yoyo: false,
             delay: 100
         });
+
+        this.flameindex = 0;
+        this.lasttime = 0;
+        this.flame = this.add.sprite(this.rocket.x, this.rocket.y+71, assetKey.flame).setFrame(0);
 
         this.start = true;
     }

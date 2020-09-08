@@ -22,4 +22,5 @@ export const ASSETS_KEY = {
     buttonStart: 'BUTTON_START',
     rocket: 'ROCKET',
     blind: 'BLIND',
+    flame: 'FLAME',
 };
