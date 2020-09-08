@@ -140,9 +140,14 @@ export class MainScene extends Phaser.Scene {
     }
 
     setRocket(index, x, y) {
+        if(this.start) {
+            return;
+        }
+
         if(this.rocket) {
             this.rocket.destroy();
         }
+
         this.selected = index + 1;
         this.rocket = this.add.image(x+30, y+20, assetKey.rocket);
     }
