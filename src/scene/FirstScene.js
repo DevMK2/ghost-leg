@@ -1,4 +1,4 @@
-import { backgroundMenu, logo } from '../assets';
+import { background, logo } from '../assets';
 
 export class FirstScene extends Phaser.Scene {
 
@@ -8,13 +8,13 @@ export class FirstScene extends Phaser.Scene {
   }
 
   preload() {
-    this.load.image('bgMenu', backgroundMenu);
+    this.load.image('background', background);
     this.load.image('logo', logo)
   }
 
   create() {
-    this.add.image(400, 500, 'bgMenu');
-    this.add.image(310, 220, 'logo');
+    this.add.image(300, 400, 'background');
+    this.add.image(310, 220,'logo');
 
     this.add.text(240, 450, 'Normal', { fill: '#ffffff' })
       .setFontSize(40)

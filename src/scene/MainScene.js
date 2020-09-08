@@ -1,4 +1,4 @@
-import { backgroundMain, rocket, blind } from '../assets';
+import { background, rocket, bind } from '../assets';
 
 export class MainScene extends Phaser.Scene {
   constructor ()
@@ -16,13 +16,13 @@ export class MainScene extends Phaser.Scene {
   }
 
   preload() {
-    this.load.image('bgMain', backgroundMain);
-    this.load.image('rocket', rocket);
+    this.load.image('background', background);
+    this.load.image("rocket", rocket);
     this.load.image('blind', blind);
   }
 
   create() {
-    this.add.image(400, 500, 'bgMain');
+    this.add.image(400, 500, 'background');
 
     this.graphics = this.add.graphics({ lineStyle: { color: 0xffffff } });
 
@@ -38,8 +38,8 @@ export class MainScene extends Phaser.Scene {
       this.path.getPoint(t, vec);
       this.rocket.setPosition(vec.x, vec.y);
     } else if (this.rocket && this.rocket.z == 1) {
-      alert('광고 보기');
-      this.scene.start('PrizeScene');
+      console.log('광고 보기');
+      //this.scene.start('PrizeScene');
     }
   }
 
@@ -143,7 +143,7 @@ export class MainScene extends Phaser.Scene {
       targets: this.rocket,
       z: 1,
       ease: 'Linear',
-      duration: 1200,
+      duration: 3000,
       repeat: 0,
       yoyo: false,
       delay: 100
