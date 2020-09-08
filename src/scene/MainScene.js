@@ -2,6 +2,8 @@ import { background, rocket, blind, buttonStart } from '../assets';
 import { 
     NORMAL_MODE, EXPERT_MODE,
     ROW, COL,
+    LADDER_HEIGHT, LADDER_WIDTH,
+    LADDER_MARGIN, LADDER_HGAP, LADDER_WGAP,
     ASSETS_KEY as assetKey
 } from '../constants';
 
@@ -62,22 +64,33 @@ export class MainScene extends Phaser.Scene {
     }
 
     createPathes() {
-        let hgap = 500 / ROW + 1;
-
-        for (let i = 0; i < ROW; i++) {
-            let leg = Phaser.Math.Between(1, COL - 1);
+        for(let i = 0; i < ROW; i++) {
+            const leg = Phaser.Math.Between(1, COL - 1);
             this.layers[i] = leg;
 
-            let path = new Phaser.Geom.Line((leg * 100), 100 + hgap * (i + 1), (leg * 100) + 100, 100 + hgap * (i + 1));
-            this.lines.push(path);
+            const from = { 
+                x: LADDER_WGAP * leg, 
+                y: LADDER_MARGIN + LADDER_HGAP * (i + 1) 
+            };
+            const to = { 
+                x: LADDER_WGAP * (leg + 1), 
+                y: LADDER_MARGIN + LADDER_HGAP * (i + 1)
+            };
+
+            this.lines.push(new Phaser.Geom.Line(from.x, from.y, to.x, to.y));
         }
 
-        let path1 = new Phaser.Geom.Line(100, 100, 100, 700);
-        let path2 = new Phaser.Geom.Line(200, 100, 200, 700);
-        let path3 = new Phaser.Geom.Line(300, 100, 300, 700);
-        let path4 = new Phaser.Geom.Line(400, 100, 400, 700);
-        let path5 = new Phaser.Geom.Line(500, 100, 500, 700);
-        this.lines.push(path1, path2, path3, path4, path5);
+        for(let i = 0; i < COL; i++) {
+            const from = { 
+                x: LADDER_WGAP * (i + 1), 
+                y: LADDER_MARGIN 
+            };
+            const to = { 
+                x: LADDER_WGAP * (i + 1),
+                y: LADDER_MARGIN + LADDER_HEIGHT
+            };
+            this.lines.push(new Phaser.Geom.Line(from.x, from.y, to.x, to.y));
+        }
 
         this.lines.forEach(line=>this.graphics.strokeLineShape(line));
     }
@@ -101,8 +114,11 @@ export class MainScene extends Phaser.Scene {
     }
 
     createStartPoints() {
-        for(let i=0; i<5; ++i) {
-            const pos = { x : 100 * i + 70, y : 730 };
+        for(let i=0; i<COL; ++i) {
+            const pos = {
+                x : LADDER_WGAP * (i + 1) - 30, 
+                y : LADDER_MARGIN + LADDER_HEIGHT + 30
+            };
 
             this.add.text(pos.x, pos.y, `Start${i+1}`)
                 .setInteractive()
@@ -114,29 +130,6 @@ export class MainScene extends Phaser.Scene {
                     this.setScale(0.9);
                 });
         }
-    }
-
-    getPath() {
-        let current = this.selected;
-        let path = new Phaser.Curves.Path(100 * current, 700);
-        let hgap = 500 / ROW + 1;
-
-        this.layers.slice().reverse().forEach((layer, index)=>{
-            let ypos = 700 - ((index + 2) * hgap);
-            if (current == layer) {
-                path.lineTo(100 * current, ypos);
-                path.lineTo(100 * current + 100, ypos);
-                current++;
-            } else if (current -1 == layer) {
-                path.lineTo(100 * current, ypos);
-                path.lineTo(100 * current + -100, ypos);
-                current--;
-            }
-        });
-
-        path.lineTo(100 * current, 100);
-
-        return path;
     }
 
     setRocket(index, x, y) {
@@ -172,5 +165,29 @@ export class MainScene extends Phaser.Scene {
         });
 
         this.start = true;
+    }
+
+    getPath() {
+        let current = this.selected;
+        let path = new Phaser.Curves.Path(LADDER_WGAP * current, LADDER_MARGIN + LADDER_HEIGHT);
+
+        console.log(this.layers.length);
+        this.layers.slice().reverse().forEach((layer, index)=>{
+            let ypos = LADDER_MARGIN + LADDER_HEIGHT - ((index + 1) * LADDER_HGAP);
+
+            if (current == layer) {
+                path.lineTo(LADDER_WGAP * current, ypos);
+                path.lineTo(LADDER_WGAP * (current + 1), ypos);
+                current++;
+            } else if (current -1 == layer) {
+                path.lineTo(LADDER_WGAP * current, ypos);
+                path.lineTo(LADDER_WGAP * (current - 1), ypos);
+                current--;
+            }
+        });
+
+        path.lineTo(LADDER_WGAP * current, LADDER_MARGIN);
+
+        return path;
     }
 }
