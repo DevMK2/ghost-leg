@@ -1,4 +1,4 @@
-import { background, rocket, blind } from '../assets';
+import { background, rocket, blind, buttonStart } from '../assets';
 import { 
     NORMAL_MODE, EXPERT_MODE,
     ROW, COL,
@@ -30,8 +30,10 @@ export class MainScene extends Phaser.Scene {
     }
 
     preload() {
+        this.load.image(assetKey.background, background);
         this.load.image(assetKey.rocket, rocket);
         this.load.image(assetKey.blind, blind);
+        this.load.image(assetKey.buttonStart, buttonStart);
     }
 
     create() {
@@ -81,9 +83,8 @@ export class MainScene extends Phaser.Scene {
     }
 
     createBlind() {
-        this.blind = this.add.image(300, 400, assetKey.blind).setScale(10, 11);
-        this.startButton = this.add.text(220, 400, `Start`, { fill: '#000000' })
-            .setFontSize(50)
+        this.blind = this.add.image(300, 400, assetKey.blind);
+        this.startButton = this.add.image(300, 400, assetKey.buttonStart)
             .setInteractive()
             .on('pointerdown', () => this.launchRocket())
             .on('pointerover', function() {
@@ -143,7 +144,7 @@ export class MainScene extends Phaser.Scene {
             this.rocket.destroy();
         }
         this.selected = index + 1;
-        this.rocket = this.add.image(x+30, y+30, assetKey.rocket);
+        this.rocket = this.add.image(x+30, y+20, assetKey.rocket);
     }
 
     launchRocket() {

@@ -8,10 +8,11 @@ export const EXPERT_MODE = 'EXPERT';
 
 //\ ASSETS NAMESPACE
 export const ASSETS_KEY = {
-  background: 'BACKGROUND',
-  logo: 'LOGO',
-  buttonNormal: 'BUTTON_NORMAL',
-  buttonExpert: 'BUTTON_EXPORT',
-  rocket: 'ROCKET',
-  blind: 'BLIND'
+    background: 'BACKGROUND',
+    logo: 'LOGO',
+    buttonNormal: 'BUTTON_NORMAL',
+    buttonExpert: 'BUTTON_EXPORT',
+    buttonStart: 'BUTTON_START',
+    rocket: 'ROCKET',
+    blind: 'BLIND',
 };
