@@ -9,11 +9,20 @@ export class FirstScene extends Phaser.Scene {
 
   preload() {
     this.load.image('background', background);
-    this.load.image('logo', logo)
+    this.load.image('logo', logo);
   }
 
-  create() {
-    this.add.image(300, 400, 'background');
+  create() {   
+    let background = this.add.image(300, 400, 'background');
+    this.add.tween({
+      targets: background,
+      x: -100,
+      ease: 'Sine.easeInOut',
+      duration: 5000,
+      repeat: -1,
+      yoyo: true,
+      delay: 100
+    });
     this.add.image(310, 220,'logo');
 
     this.add.text(240, 450, 'Normal', { fill: '#ffffff' })

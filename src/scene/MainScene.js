@@ -134,6 +134,9 @@ export class MainScene extends Phaser.Scene {
   }
 
   launchRocket() {
+    if (this.selected == 0)
+      return;
+
     this.removeBlind();
 
     this.path = this.getPath();
