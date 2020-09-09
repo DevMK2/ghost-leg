@@ -35,14 +35,14 @@ export class MainScene extends Phaser.Scene {
         this.load.image(assetKey.background, background);
         this.load.image(assetKey.rocket, rocket);
         this.load.image(assetKey.blind, blind);
-        this.load.image(assetKey.buttonStart, buttonStart);
         this.load.image(assetKey.destination[0], destination1);
         this.load.image(assetKey.destination[1], destination2);
         this.load.image(assetKey.destination[2], destination3);
         this.load.image(assetKey.starting[0], starting1);
         this.load.image(assetKey.starting[1], starting2);
         this.load.image(assetKey.starting[2], starting3);
-        this.load.spritesheet(assetKey.flame, flame, { frameWidth: 14, frameHeight: 71, spacing: 14 }); 
+        this.load.spritesheet(assetKey.buttonStart, buttonStart, { frameWidth: 218, frameHeight: 105 });
+        this.load.spritesheet(assetKey.flame, flame, { frameWidth: 40, frameHeight: 66 }); 
     }
 
     create() {
@@ -67,7 +67,7 @@ export class MainScene extends Phaser.Scene {
     update(time, delta) {
         if(this.flame) {
             if(Math.abs(this.lasttime - time) > 50) {
-                this.flame.setFrame(this.flameindex++ % 3);
+                this.flame.setFrame(this.flameindex++ % 9);
                 this.lasttime = time;
             }
         }
@@ -77,10 +77,10 @@ export class MainScene extends Phaser.Scene {
             const vec = this.rocket.getData('vector');
             this.path.getPoint(t, vec);
             this.rocket.setPosition(vec.x, vec.y);
-            this.flame.setPosition(vec.x, vec.y + 70);
+            this.flame.setPosition(vec.x, vec.y + 66);
         } else if (this.rocket && this.rocket.z == 1) {
             console.log('광고 보기');
-            this.flame.destroy();
+            //this.flame.destroy();
             //this.scene.start('PrizeScene');
         }
     }
@@ -127,10 +127,10 @@ export class MainScene extends Phaser.Scene {
             .setInteractive()
             .on('pointerdown', () => this.launchRocket())
             .on('pointerover', function() {
-                this.setScale(1.1);
+                this.setFrame(1);
             })
             .on('pointerout', function() {
-                this.setScale(0.9);
+                this.setFrame(0);
             });
     }
 
@@ -203,7 +203,7 @@ export class MainScene extends Phaser.Scene {
 
         this.flameindex = 0;
         this.lasttime = 0;
-        this.flame = this.add.sprite(this.rocket.x, this.rocket.y+71, assetKey.flame).setFrame(0);
+        this.flame = this.add.sprite(this.rocket.x, this.rocket.y+66, assetKey.flame).setFrame(0);
 
         this.start = true;
     }

@@ -11,8 +11,8 @@ export class FirstScene extends Phaser.Scene {
     preload() {
         this.load.image(assetKey.background, background);
         this.load.image(assetKey.logo, logo);
-        this.load.spritesheet(assetKey.buttonNormal, buttonNormal, { frameWidth: 150, frameHeight: 50 });
-        this.load.spritesheet(assetKey.buttonExpert, buttonExpert, { frameWidth: 150, frameHeight: 50 });
+        this.load.spritesheet(assetKey.buttonNormal, buttonNormal, { frameWidth: 218, frameHeight: 105 });
+        this.load.spritesheet(assetKey.buttonExpert, buttonExpert, { frameWidth: 218, frameHeight: 105 });
     }
 
     create() {   
@@ -35,7 +35,7 @@ export class FirstScene extends Phaser.Scene {
             loop: 0
         });
 
-        this.add.sprite(325, 450, assetKey.buttonNormal)
+        this.add.sprite(325, 500, assetKey.buttonNormal)
             .setInteractive()
             .on('pointerdown', () => this.scene.start('MainScene', NORMAL_MODE))
             .on('pointerover', function() {
@@ -44,7 +44,7 @@ export class FirstScene extends Phaser.Scene {
             .on('pointerout', function() {
                 this.setFrame(0);
             });
-        this.add.sprite(325, 550, assetKey.buttonExpert)
+        this.add.sprite(325, 650, assetKey.buttonExpert)
             .setInteractive()
             .on('pointerdown', () => this.scene.start('MainScene', EXPERT_MODE))
             .on('pointerover', function() {
