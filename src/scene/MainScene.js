@@ -1,4 +1,4 @@
-import { background, rocket, blind, buttonStart, flame, destination1, destination2, destination3, starting1, starting2, starting3 } from '../assets';
+import { background, rocket, blind, buttonStart, flame, destination1, destination2, destination3, starting, plus, minus, input } from '../assets';
 import { 
     NORMAL_MODE, EXPERT_MODE,
     ROW, COL,
@@ -16,8 +16,14 @@ export class MainScene extends Phaser.Scene {
 
         this.lines = [];
 
+        this.bet = 10;
+        this.betMin = 10;
+        this.betMax = 100;
+
         this.selected = 0;
         this.start = false;
+
+        this.isExpert = false;
     }
 
     init(mode) {
@@ -27,6 +33,7 @@ export class MainScene extends Phaser.Scene {
                 break;
             case EXPERT_MODE:
                 console.log('expert');
+                this.isExpert = true;
                 break;
         }
     }
@@ -38,30 +45,25 @@ export class MainScene extends Phaser.Scene {
         this.load.image(assetKey.destination[0], destination1);
         this.load.image(assetKey.destination[1], destination2);
         this.load.image(assetKey.destination[2], destination3);
-        this.load.image(assetKey.starting[0], starting1);
-        this.load.image(assetKey.starting[1], starting2);
-        this.load.image(assetKey.starting[2], starting3);
+        this.load.image(assetKey.starting, starting);
+        this.load.image(assetKey.input[0], input);
+        this.load.image(assetKey.input[1], plus);
+        this.load.image(assetKey.input[2], minus);
         this.load.spritesheet(assetKey.buttonStart, buttonStart, { frameWidth: 218, frameHeight: 105 });
-        this.load.spritesheet(assetKey.flame, flame, { frameWidth: 40, frameHeight: 66 }); 
+        this.load.spritesheet(assetKey.flame, flame, { frameWidth: 40, frameHeight: 66 });
     }
 
     create() {
         let background = this.add.image(300, 400, assetKey.background);
-        this.add.tween({
-            targets: background,
-            x: -100,
-            ease: 'Sine.easeInOut',
-            duration: 10000,
-            repeat: -1,
-            yoyo: true
-        });
 
         this.graphics = this.add.graphics({ lineStyle: { color: 0xffffff } });
 
-        this.createPathes();
+        //this.createPathes();
         this.createBlind();
         this.createStartPoints();
         this.createDestinationPoints();
+        if (this.isExpert)
+            this.createInputBox();
     }
 
     update(time, delta) {
@@ -122,7 +124,7 @@ export class MainScene extends Phaser.Scene {
     }
 
     createBlind() {
-        this.blind = this.add.image(300, 450, assetKey.blind);
+        //this.blind = this.add.image(300, 450, assetKey.blind);
         this.startButton = this.add.image(300, 450, assetKey.buttonStart)
             .setInteractive()
             .on('pointerdown', () => this.launchRocket())
@@ -135,7 +137,7 @@ export class MainScene extends Phaser.Scene {
     }
 
     removeBlind() {
-        this.blind.destroy();
+        //this.blind.destroy();
         this.startButton.destroy();
     }
 
@@ -146,15 +148,9 @@ export class MainScene extends Phaser.Scene {
                 y : LADDER_MARGIN + LADDER_HEIGHT + 30
             };
 
-            this.add.image(pos.x, pos.y, assetKey.starting[i])
+            this.add.image(pos.x, pos.y, assetKey.starting)
                 .setInteractive()
-                .on('pointerdown', () => this.setRocket(i, pos.x, pos.y))
-                .on('pointerover', function() {
-                    this.setScale(1.1);
-                })
-                .on('pointerout', function() {
-                    this.setScale(0.9);
-                });
+                .on('pointerdown', () => this.setRocket(i, pos.x, pos.y));
         }
     }
 
@@ -186,6 +182,7 @@ export class MainScene extends Phaser.Scene {
         if (this.selected == 0)
             return;
 
+        this.createPathes();
         this.removeBlind();
 
         this.path = this.getPath();
@@ -230,5 +227,20 @@ export class MainScene extends Phaser.Scene {
         path.lineTo(LADDER_WGAP * current, LADDER_MARGIN);
 
         return path;
+    }
+
+    createInputBox() {
+        this.add.image(300, 50, assetKey.input[0]);
+        this.add.image(450, 50, assetKey.input[1])
+            .setInteractive()
+            .on('pointerdown', () => {this.bet = Math.min(this.bet + 10, this.betMax); this.drawBetPoint();});
+        this.add.image(150, 50, assetKey.input[2])
+            .setInteractive()
+            .on('pointerdown', () => {this.bet = Math.max(this.bet - 10, this.betMin); this.drawBetPoint();});
+        this.betText = this.add.text(270, 30, this.bet, {fontSize: 50});
+    }
+
+    drawBetPoint() {
+        this.betText.setText(this.bet);
     }
 }

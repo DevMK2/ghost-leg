@@ -17,14 +17,7 @@ export class FirstScene extends Phaser.Scene {
 
     create() {   
         let background = this.add.image(300, 400, assetKey.background);
-        this.add.tween({
-            targets: background,
-            x: -100,
-            ease: 'Sine.easeInOut',
-            duration: 10000,
-            repeat: -1,
-            yoyo: true
-        });
+
         let logo = this.add.image(310, -300, assetKey.logo);
         this.tweens.add({
             targets: logo,

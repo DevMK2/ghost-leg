@@ -9,9 +9,10 @@ import buttonStart from './button_start.png';
 import destination1 from './destination1.png';
 import destination2 from './destination2.png';
 import destination3 from './destination3.png';
-import starting1 from './starting1.png';
-import starting2 from './starting2.png';
-import starting3 from './starting3.png';
+import starting from './starting.png';
+import plus from './plus.png';
+import minus from './minus.png';
+import input from './input.png';
 
 export { 
     logo,
@@ -25,7 +26,8 @@ export {
     destination1,
     destination2,
     destination3,
-    starting1,
-    starting2,
-    starting3,
+    starting,
+    plus,
+    minus,
+    input,
 };

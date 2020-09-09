@@ -24,5 +24,6 @@ export const ASSETS_KEY = {
     blind: 'BLIND',
     flame: 'FLAME',
     destination: ['DESTINATION_1', 'DESTINATION_2', 'DESTINATION_3'],
-    starting: ['STARTING_1', 'STARTING_2', 'STARTING_3'],
+    starting: 'STARTING',
+    input: ['INPUT', 'PLUS', 'MINUS'],
 };
