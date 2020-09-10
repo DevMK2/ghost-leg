@@ -13,6 +13,10 @@ import starting from './starting.png';
 import plus from './plus.png';
 import minus from './minus.png';
 import input from './input.png';
+import stone from './stone.png';
+import help from './help.png';
+import soundOnOff from './sound_onoff.png';
+import soundFile from './main.mp3';
 
 export { 
     logo,
@@ -30,4 +34,8 @@ export {
     plus,
     minus,
     input,
+    stone,
+    help,
+    soundOnOff,
+    soundFile,
 };

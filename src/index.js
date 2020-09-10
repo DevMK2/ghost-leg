@@ -9,10 +9,13 @@ const config = {
     height: 800,
     autoFocus: true,
     disableContextMenu: false,
+    rows: 10,
+    cols: 3,
     scene: [ 
         FirstScene, 
         MainScene,
     ]
 };
 
-const game = new Phaser.Game(config);
+var game = new Phaser.Game(config);
+

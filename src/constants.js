@@ -1,5 +1,8 @@
 //\ GAME PROPERTIES
-export const ROW = 5;
+export const GAME_WIDTH = 600;
+export const GAME_HEIGHT = 800;
+
+export const ROW = 10;
 export const COL = 3;
 
 export const LADDER_MARGIN = 200;
@@ -26,4 +29,9 @@ export const ASSETS_KEY = {
     destination: ['DESTINATION_1', 'DESTINATION_2', 'DESTINATION_3'],
     starting: 'STARTING',
     input: ['INPUT', 'PLUS', 'MINUS'],
+    stone: 'STONE',
+    help: ['HELP_1', 'HELP_2', 'HELP_3'],
+    sound: ['SOUND_ON', 'SOUND_OFF'],
+    bgm: 'BGM',
+    soundOnOff: 'BUTTON_SOUND',
 };
