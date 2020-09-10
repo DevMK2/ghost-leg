@@ -1,4 +1,4 @@
-import { background, rocket, blind, buttonStart, flame, destination1, destination2, destination3, starting, plus, minus, input, help } from '../assets';
+import { background, rocket, blind, buttonStart, flame, destination1, destination2, destination3, starting, plus, minus, input, help, rocketSound } from '../assets';
 import { 
     NORMAL_MODE, EXPERT_MODE,
     ROW, COL,
@@ -29,15 +29,14 @@ export class MainScene extends Phaser.Scene {
     init(data) {
         switch(data.mode) {
             case NORMAL_MODE:
-                console.log('normal');
                 break;
             case EXPERT_MODE:
-                console.log('expert');
                 this.isExpert = true;
                 break;
         }
 
         this.music = data.sound;
+        this.click = data.click;
     }
 
     preload() {
@@ -56,9 +55,12 @@ export class MainScene extends Phaser.Scene {
         this.load.image(assetKey.help[0], help);
         this.load.image(assetKey.help[1], help);
         this.load.image(assetKey.help[2], help);
+        this.load.audio(assetKey.rocketSound, rocketSound);
     }
 
     create() {
+        this.rocketSound = this.sound.add(assetKey.rocketSound);
+
         let background = this.add.image(300, 400, assetKey.background);
 
         this.graphics = this.add.graphics({ lineStyle: { color: 0xffffff } });
@@ -95,11 +97,12 @@ export class MainScene extends Phaser.Scene {
             for(let y = 0; y < ROW; y++) {        
                 const toX = x + 1;
                 const toY = y + Phaser.Math.Between(y == 0 ? 0 : -1, y == ROW - 1 ? 0 : 1);
-
+                
                 if (this.layers.find(e => e.from.x == x && e.from.y == y)) continue;
                 if (this.layers.find(e => e.to.x == x && e.to.y == y)) continue;
                 if (this.layers.find(e => e.from.x == toX && e.from.y == toY)) continue;
                 if (this.layers.find(e => e.to.x == toX && e.to.y == toY)) continue;
+                console.log(x, y, toX, toY);
 
                 this.layers.push({from:{x:x, y:y}, to:{x:toX, y:toY}});
 
@@ -115,6 +118,7 @@ export class MainScene extends Phaser.Scene {
                 this.lines.push(new Phaser.Geom.Line(from.x, from.y, to.x, to.y));
             }
         }
+        console.log(this.layers);
 
         for(let i = 0; i < COL; i++) {
             const from = { 
@@ -136,7 +140,7 @@ export class MainScene extends Phaser.Scene {
         //this.blind = this.add.image(300, 450, assetKey.blind);
         this.startButton = this.add.image(300, 450, assetKey.buttonStart)
             .setInteractive()
-            .on('pointerdown', () => this.launchRocket())
+            .on('pointerdown', () => {this.click.play(); this.launchRocket();})
             .on('pointerover', function() {
                 this.setFrame(1);
             })
@@ -163,7 +167,7 @@ export class MainScene extends Phaser.Scene {
 
             this.add.image(pos.x, pos.y, assetKey.starting)
                 .setInteractive()
-                .on('pointerdown', () => this.setRocket(i, pos.x, pos.y));
+                .on('pointerdown', () => {if (this.start) return; this.click.play(); this.setRocket(i, pos.x, pos.y);});
         }
     }
 
@@ -185,10 +189,6 @@ export class MainScene extends Phaser.Scene {
 
     setRocket(index, x, y) {
         this.showHelp(false);
-
-        if(this.start) {
-            return;
-        }
 
         if(this.rocket) {
             this.rocket.destroy();
@@ -227,6 +227,8 @@ export class MainScene extends Phaser.Scene {
         this.flame.play('fire');
         this.flame.visible = true;
 
+        this.rocketSound.play({loop: true});
+
         this.tweens.add({
             targets: this.rocket,
             z: 1,
@@ -236,6 +238,7 @@ export class MainScene extends Phaser.Scene {
             yoyo: false,
             delay: 100,
             onComplete: () => {
+                this.rocketSound.stop();
             }
         });
 
@@ -245,17 +248,17 @@ export class MainScene extends Phaser.Scene {
     getPath() {
         let current = {x:this.selected - 1, y:ROW - 1};
         let path = new Phaser.Curves.Path(LADDER_WGAP * (current.x + 1), LADDER_MARGIN + LADDER_HEIGHT);
-        
+
         while (current.y >= 0) {
-            let to = this.layers.find(e => e.from.x == current.x && e.from.y == current.y && e.from.y >= e.to.y);
-            let from = this.layers.find(e => e.to.x == current.x && e.to.y == current.y && e.from.y <= e.to.y);
+            let to = this.layers.find(e => (e.from.x == current.x && e.from.y == current.y));
+            let from = this.layers.find(e => (e.to.x == current.x && e.to.y == current.y));
             let next = to ? to.to : from ? from.from : null;
 
             path.lineTo(LADDER_WGAP * (current.x + 1), LADDER_MARGIN + ((current.y + 1) * LADDER_HGAP));
 
             if (next) {                
                 path.lineTo(LADDER_WGAP * (next.x + 1), LADDER_MARGIN + ((next.y + 1) * LADDER_HGAP));
-                current = next;
+                current = {x: next.x, y: next.y};
             }
 
             current.y -= 1;
@@ -270,10 +273,10 @@ export class MainScene extends Phaser.Scene {
         this.add.image(300, 50, assetKey.input[0]);
         this.add.image(450, 50, assetKey.input[1])
             .setInteractive()
-            .on('pointerdown', () => {if (this.start) return; this.bet = Math.min(this.bet + 10, this.betMax); this.drawBetPoint();});
+            .on('pointerdown', () => {if (this.start) return; this.click.play(); this.bet = Math.min(this.bet + 10, this.betMax); this.drawBetPoint();});
         this.add.image(150, 50, assetKey.input[2])
             .setInteractive()
-            .on('pointerdown', () => {if (this.start) return; this.bet = Math.max(this.bet - 10, this.betMin); this.drawBetPoint();});
+            .on('pointerdown', () => {if (this.start) return; this.click.play(); this.bet = Math.max(this.bet - 10, this.betMin); this.drawBetPoint();});
         this.betText = this.add.text(270, 30, this.bet, {fontSize: 50});
     }
 

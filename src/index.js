@@ -11,6 +11,10 @@ const config = {
     disableContextMenu: false,
     rows: 10,
     cols: 3,
+    scale: {
+        mode: Phaser.Scale.FIT,
+        autoCenter: Phaser.Scale.CENTER_BOTH
+    },
     scene: [ 
         FirstScene, 
         MainScene,

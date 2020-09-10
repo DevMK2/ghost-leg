@@ -17,6 +17,8 @@ import stone from './stone.png';
 import help from './help.png';
 import soundOnOff from './sound_onoff.png';
 import soundFile from './main.mp3';
+import clickSound from './click.mp3';
+import rocketSound from './rocket.mp3';
 
 export { 
     logo,
@@ -38,4 +40,6 @@ export {
     help,
     soundOnOff,
     soundFile,
+    clickSound,
+    rocketSound,
 };

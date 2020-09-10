@@ -34,4 +34,6 @@ export const ASSETS_KEY = {
     sound: ['SOUND_ON', 'SOUND_OFF'],
     bgm: 'BGM',
     soundOnOff: 'BUTTON_SOUND',
+    clickSound: 'CLICK_SOUND',
+    rocketSound: 'ROCKET_SOUND',
 };

@@ -1,4 +1,4 @@
-import { background, logo, buttonNormal, buttonExpert, stone, soundOnOff, soundFile } from '../assets';
+import { background, logo, buttonNormal, buttonExpert, stone, soundOnOff, soundFile, clickSound } from '../assets';
 import { NORMAL_MODE, EXPERT_MODE, ASSETS_KEY as assetKey } from '../constants';
 //import soundFile from '../assets/main.mp3';
 export class FirstScene extends Phaser.Scene {
@@ -17,11 +17,14 @@ export class FirstScene extends Phaser.Scene {
         this.load.spritesheet(assetKey.buttonExpert, buttonExpert, { frameWidth: 218, frameHeight: 105 });
         this.load.audio(assetKey.bgm, soundFile);
         this.load.spritesheet(assetKey.soundOnOff, soundOnOff, { frameWidth: 63, frameHeight: 53 });
+        this.load.audio(assetKey.clickSound, clickSound);
     }
 
     create() {   
         this.music = this.sound.add(assetKey.bgm);
         this.music.play({loop: true});
+
+        this.click = this.sound.add(assetKey.clickSound);
 
         let background = this.add.image(300, 400, assetKey.background);
         for (let i = 0; i < 3; i++) {
@@ -40,7 +43,10 @@ export class FirstScene extends Phaser.Scene {
 
         this.add.sprite(325, 500, assetKey.buttonNormal)
             .setInteractive()
-            .on('pointerdown', () => this.scene.start('MainScene', {mode:NORMAL_MODE, sound:this.music}))
+            .on('pointerdown', () => {
+                this.click.play();
+                this.scene.start('MainScene', {mode:NORMAL_MODE, sound:this.music, click:this.click});
+            })
             .on('pointerover', function() {
                 this.setFrame(1);
             })
@@ -49,7 +55,10 @@ export class FirstScene extends Phaser.Scene {
             });
         this.add.sprite(325, 650, assetKey.buttonExpert)
             .setInteractive()
-            .on('pointerdown', () => this.scene.start('MainScene', {mode:EXPERT_MODE, sound:this.music}))
+            .on('pointerdown', () => {
+                this.click.play();
+                this.scene.start('MainScene', {mode:EXPERT_MODE, sound:this.music, click:this.click});
+            })
             .on('pointerover', function() {
                 this.setFrame(1);
             })
