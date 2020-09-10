@@ -26,7 +26,7 @@ export class FirstScene extends Phaser.Scene {
 
         this.click = this.sound.add(assetKey.clickSound);
 
-        let background = this.add.image(300, 400, assetKey.background);
+        this.add.image(300, 400, assetKey.background).setDepth(-2);
         for (let i = 0; i < 3; i++) {
             this.createMeteor();
         }
@@ -82,6 +82,7 @@ export class FirstScene extends Phaser.Scene {
         let stone = this.add.sprite(isLeft ? -100 : 700, posY, assetKey.stone);
         stone.angle = Phaser.Math.Between(-180, 180);
         stone.setFrame(Phaser.Math.Between(0, 4));
+        stone.setDepth(-1);
         this.tweens.add({
             targets: stone,
             x: isLeft ? 700 : -100,
