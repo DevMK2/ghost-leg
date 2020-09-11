@@ -60,6 +60,8 @@ export class MainScene extends Phaser.Scene {
 
         this.music = data.sound;
         this.click = data.click;
+
+        this.points = gameConfig.points;
     }
 
     preload() {
@@ -84,9 +86,9 @@ export class MainScene extends Phaser.Scene {
     create() {
         this.rocketSound = this.sound.add(assetKey.rocketSound);
 
-        let background = this.add.image(300, 400, assetKey.background);
+        this.add.image(300, 400, assetKey.background);
 
-        this.graphics = this.add.graphics({ lineStyle: { color: 0xffffff } });
+        this.graphics = this.add.graphics();
 
         this.createBlind();
         this.createStartPoints();
@@ -101,8 +103,7 @@ export class MainScene extends Phaser.Scene {
         
         if (this.start && this.rocket.z < 1) {
             const t = this.rocket.z;
-            const vec = this.rocket.getData('vector');
-            this.path.getPoint(t, vec);
+            const vec = this.path.getPoint(t);
             this.rocket.setPosition(vec.x, vec.y);
             this.flame.setPosition(vec.x, vec.y + 66);
         } else if (this.rocket && this.rocket.z == 1) {
@@ -125,7 +126,6 @@ export class MainScene extends Phaser.Scene {
                 if (this.layers.find(e => e.to.x == x && e.to.y == y)) continue;
                 if (this.layers.find(e => e.from.x == toX && e.from.y == toY)) continue;
                 if (this.layers.find(e => e.to.x == toX && e.to.y == toY)) continue;
-                console.log(x, y, toX, toY);
 
                 this.layers.push({from:{x:x, y:y}, to:{x:toX, y:toY}});
 
@@ -141,7 +141,6 @@ export class MainScene extends Phaser.Scene {
                 this.lines.push(new Phaser.Geom.Line(from.x, from.y, to.x, to.y));
             }
         }
-        console.log(this.layers);
 
         for(let i = 0; i < COL; i++) {
             const from = { 
@@ -160,7 +159,6 @@ export class MainScene extends Phaser.Scene {
     }
 
     createBlind() {
-        //this.blind = this.add.image(300, 450, assetKey.blind);
         this.startButton = this.add.image(300, 450, assetKey.buttonStart)
             .setInteractive()
             .on('pointerdown', () => {this.click.play(); this.launchRocket();})
@@ -173,7 +171,6 @@ export class MainScene extends Phaser.Scene {
     }
 
     removeBlind() {
-        //this.blind.destroy();
         this.startButton.destroy();
     }
 
@@ -245,7 +242,8 @@ export class MainScene extends Phaser.Scene {
         this.removeBlind();
 
         this.path = this.getPath();
-        this.rocket.setData('vector', new Phaser.Math.Vector2());
+        //this.graphics.lineStyle(15, 0xff5200);
+        //this.path.draw(this.graphics);
         this.rocket.play('move');
         this.flame.play('fire');
         this.flame.visible = true;
@@ -277,9 +275,8 @@ export class MainScene extends Phaser.Scene {
             let from = this.layers.find(e => (e.to.x == current.x && e.to.y == current.y));
             let next = to ? to.to : from ? from.from : null;
 
-            path.lineTo(LADDER_WGAP * (current.x + 1), LADDER_MARGIN + ((current.y + 1) * LADDER_HGAP));
-
             if (next) {                
+                path.lineTo(LADDER_WGAP * (current.x + 1), LADDER_MARGIN + ((current.y + 1) * LADDER_HGAP));
                 path.lineTo(LADDER_WGAP * (next.x + 1), LADDER_MARGIN + ((next.y + 1) * LADDER_HGAP));
                 current = {x: next.x, y: next.y};
             }
@@ -296,14 +293,21 @@ export class MainScene extends Phaser.Scene {
         this.add.image(300, 50, assetKey.input[0]);
         this.add.image(450, 50, assetKey.input[1])
             .setInteractive()
-            .on('pointerdown', () => {if (this.start) return; this.click.play(); this.bet = Math.min(this.bet + 10, this.betMax); this.drawBetPoint();});
+            .on('pointerdown', () => {this.drawBetPoint(10);});
         this.add.image(150, 50, assetKey.input[2])
             .setInteractive()
-            .on('pointerdown', () => {if (this.start) return; this.click.play(); this.bet = Math.max(this.bet - 10, this.betMin); this.drawBetPoint();});
+            .on('pointerdown', () => {this.drawBetPoint(-10);});
         this.betText = this.add.text(270, 30, this.bet, {fontSize: 50});
     }
 
-    drawBetPoint() {
+    drawBetPoint(bet) {
+        if (this.start) return;
+        
+        this.click.play();
+        this.bet += bet;
+        this.bet = Math.min(this.bet, this.betMax);
+        this.bet = Math.max(this.bet, this.betMin);
+        this.bet = Math.min(this.bet, Math.floor(this.points / 10) * 10);
         this.betText.setText(this.bet);
     }
 

@@ -4,13 +4,11 @@ import {MainScene} from "./scene/MainScene";
 
 const config = {
     type: Phaser.AUTO,
-    parent: "ghost-leg",
+    parent: gameConfig.target,
     width: 600,
     height: 800,
     autoFocus: true,
     disableContextMenu: false,
-    rows: 10,
-    cols: 3,
     scale: {
         mode: Phaser.Scale.FIT,
         autoCenter: Phaser.Scale.CENTER_BOTH
@@ -22,4 +20,3 @@ const config = {
 };
 
 var game = new Phaser.Game(config);
-
