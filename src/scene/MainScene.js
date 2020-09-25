@@ -1,4 +1,4 @@
-import { background, rocket, blind, buttonStart, flame, destination1, destination2, destination3, starting, plus, minus, input, help, rocketSound } from '../assets';
+import { background, rocket, blind, buttonStart, flame, destination1, destination2, destination3, starting, plus, minus, input, help, rocketSound, chance, myPoint } from '../assets';
 import { 
     NORMAL_MODE, EXPERT_MODE,
     ROW, COL,
@@ -39,12 +39,9 @@ export class MainScene extends Phaser.Scene {
 
         this.lines = [];
 
-        this.bet = 10;
-        this.betMin = 10;
-        this.betMax = 100;
-
         this.selected = 0;
         this.start = false;
+        this.drawIndex = 0;
 
         this.isExpert = false;
     }
@@ -62,6 +59,9 @@ export class MainScene extends Phaser.Scene {
         this.click = data.click;
 
         this.points = gameConfig.points;
+        this.betMin = gameConfig.minBet;
+        this.betMax = gameConfig.maxBet;
+        this.bet = gameConfig.defaultBet;
     }
 
     preload() {
@@ -80,7 +80,9 @@ export class MainScene extends Phaser.Scene {
         this.load.image(assetKey.help[0], help);
         this.load.image(assetKey.help[1], help);
         this.load.image(assetKey.help[2], help);
+        this.load.image(assetKey.chance, chance);
         this.load.audio(assetKey.rocketSound, rocketSound);
+        this.load.image(assetKey.myPoint, myPoint);
     }
 
     create() {
@@ -92,7 +94,7 @@ export class MainScene extends Phaser.Scene {
 
         this.createBlind();
         this.createStartPoints();
-        this.createDestinationPoints();
+        
         if (this.isExpert)
             this.createInputBox();
         this.createSoundOnOff();
@@ -100,14 +102,59 @@ export class MainScene extends Phaser.Scene {
 
     update(time, delta) {
         this.soundOnOff.setFrame(this.music.mute ? 1 : 0);
+
+        if (this.betPlusButton) {
+            if (!this.betPlusButton.run) {
+                if (time - this.betPlusButton.down > 1000) {
+                    this.betPlusButton.run = true;
+                    this.drawBetPoint(1000);
+                    this.betPlusButton.down = time;
+                }
+            } else {
+                if (time - this.betPlusButton.down > 100) {
+                    this.drawBetPoint(1000);
+                    this.betPlusButton.down = time;
+                }
+            }
+        }
+        if (this.betMinusButton) {
+            if (!this.betMinusButton.run) {
+                if (time - this.betMinusButton.down > 1000) {
+                    this.betMinusButton.run = true;
+                    this.drawBetPoint(-1000);
+                    this.betMinusButton.down = time;
+                }
+            } else {
+                if (time - this.betMinusButton.down > 100) {
+                    this.drawBetPoint(-1000);
+                    this.betMinusButton.down = time;
+                }
+            }
+        }
         
         if (this.start && this.rocket.z < 1) {
             const t = this.rocket.z;
             const vec = this.path.getPoint(t);
-            this.rocket.setPosition(vec.x, vec.y);
-            this.flame.setPosition(vec.x, vec.y + 66);
+            //this.rocket.setPosition(vec.x, vec.y);
+            //this.flame.setPosition(vec.x, vec.y + 66);
+
+            
+            if (t > 0) {
+                //this.graphics.clear();
+                this.graphics.lineStyle(15, 0xff5200);
+                let x = this.path.getPoints(10);
+                let p = x.slice(this.drawIndex, x.length * t);
+                let vec = p[p.length - 1];
+                if (vec) {
+                    this.drawIndex = p.length;
+                    this.graphics.strokePoints(p);
+                    this.rocket.setPosition(vec.x, vec.y);
+                    this.flame.setPosition(vec.x, vec.y + 66);
+                }
+            }
+            //this.path.draw(this.graphics);
         } else if (this.rocket && this.rocket.z == 1) {
-            console.log('광고 보기');
+            this.goNext();
             //this.scene.start('PrizeScene');
         }
     }
@@ -117,8 +164,13 @@ export class MainScene extends Phaser.Scene {
 
     createPathes() {
         this.layers = [];
-        for(let x = 0; x < COL - 1; x++) {
-            for(let y = 0; y < ROW; y++) {        
+        let sum = [];
+
+        for(let y = 0; y < ROW; y++) {        
+            for(let x = 0; x < COL - 1; x++) {
+                if (!sum[x]) sum[x] = 0;
+                if (sum[x] > ROW / 2) continue;
+
                 const toX = x + 1;
                 const toY = y + Phaser.Math.Between(y == 0 ? 0 : -1, y == ROW - 1 ? 0 : 1);
                 
@@ -126,8 +178,6 @@ export class MainScene extends Phaser.Scene {
                 if (this.layers.find(e => e.to.x == x && e.to.y == y)) continue;
                 if (this.layers.find(e => e.from.x == toX && e.from.y == toY)) continue;
                 if (this.layers.find(e => e.to.x == toX && e.to.y == toY)) continue;
-
-                this.layers.push({from:{x:x, y:y}, to:{x:toX, y:toY}});
 
                 const from = { 
                     x: LADDER_WGAP * (x + 1), 
@@ -138,7 +188,11 @@ export class MainScene extends Phaser.Scene {
                     y: LADDER_MARGIN + LADDER_HGAP * (toY + 1)
                 };
     
-                this.lines.push(new Phaser.Geom.Line(from.x, from.y, to.x, to.y));
+                const line = new Phaser.Geom.Line(from.x, from.y, to.x, to.y);
+                this.lines.push(line);
+                this.layers.push({from:{x:x, y:y}, to:{x:toX, y:toY}, line: line, isChance: false});
+
+                sum[x]++;
             }
         }
 
@@ -156,10 +210,16 @@ export class MainScene extends Phaser.Scene {
 
         this.graphics.lineGradientStyle(15, 0x00fffff, 0xffffff, 0xffffff, 0x00ffff, 1);
         this.lines.forEach(line=>this.graphics.strokeLineShape(line));
+
+        //let pick = this.layers[Math.floor(Math.random() * this.layers.length)];
+        //pick.isChance = true;
+
+        //const c = Phaser.Geom.Line.GetMidPoint(pick.line);
+        //this.add.image(c.x, c.y, assetKey.chance);
     }
 
     createBlind() {
-        this.startButton = this.add.image(300, 450, assetKey.buttonStart)
+        this.startButton = this.add.image(300, 350, assetKey.buttonStart)
             .setInteractive()
             .on('pointerdown', () => {this.click.play(); this.launchRocket();})
             .on('pointerover', function() {
@@ -168,10 +228,19 @@ export class MainScene extends Phaser.Scene {
             .on('pointerout', function() {
                 this.setFrame(0);
             });
+        
+        if (this.isExpert) {
+            this.myPoint = this.add.image(300, 550, assetKey.myPoint);
+            this.myPointFrame = this.add.text(300, 570, this.points, {fontSize: 30});
+        }
     }
 
     removeBlind() {
         this.startButton.destroy();
+        if (this.isExpert) {
+            this.myPoint.destroy();
+            this.myPointFrame.destroy();
+        }
     }
 
     createStartPoints() {
@@ -216,6 +285,7 @@ export class MainScene extends Phaser.Scene {
 
         this.selected = index + 1;
         this.rocket = this.add.sprite(x, y, assetKey.rocket);
+        this.rocket.setDepth(1);
         this.anims.create({
             key: 'move',
             frames: this.anims.generateFrameNumbers(assetKey.rocket, { start: 0, end: 1 }),
@@ -224,6 +294,7 @@ export class MainScene extends Phaser.Scene {
         });
         this.flame = this.add.sprite(x, y+66, assetKey.flame);
         this.flame.visible = false;
+        this.flame.setDepth(1);
         this.anims.create({
             key: 'fire',
             frames: this.anims.generateFrameNumbers(assetKey.flame, { start: 0, end: 8 }),
@@ -239,6 +310,7 @@ export class MainScene extends Phaser.Scene {
         }
 
         this.createPathes();
+        this.createDestinationPoints();
         this.removeBlind();
 
         this.path = this.getPath();
@@ -290,15 +362,75 @@ export class MainScene extends Phaser.Scene {
     }
 
     createInputBox() {
+        /*
+        this.add.image(300, 50, assetKey.input[0]);
+
+        const style = {
+            width: '140px',
+            height: '50px',
+            border: '0',
+            background: 'transparent',
+            color: 'white',
+            'font-size': '50px',
+            'text-align': 'right',
+        };
+        let input = document.createElement('input');
+        input.style = 'width:140px; height:50px; border:0; background: transparent; color:white; font-size:50px; text-align:right; -webkit-appearance: none; -moz-appearance: none; appearance: none;';
+        input.type = 'number';
+        input.maxLength = 5;
+
+        this.bet = Math.min(this.betMax, this.bet);
+        this.bet = Math.min(this.points, this.bet);
+        this.bet = Math.max(this.betMin, this.bet);
+
+        input.value = this.bet;
+        input.onkeyup = () => {
+            this.checkBet();
+        }
+
+        this.input = input;
+        this.inputBox = this.add.dom(320, 50, input);
+        */
+
         this.add.image(300, 50, assetKey.input[0]);
         this.add.image(450, 50, assetKey.input[1])
             .setInteractive()
-            .on('pointerdown', () => {this.drawBetPoint(10);});
+            .on('pointerdown', (pointer) => {
+                this.betPlusButton = {down:pointer.downTime, run:false};
+            })
+            .on('pointerup', (pointer) => {
+                if (pointer.upTime - pointer.downTime < 1000)
+                    this.drawBetPoint(100);
+                this.betPlusButton = null;
+            });
         this.add.image(150, 50, assetKey.input[2])
             .setInteractive()
-            .on('pointerdown', () => {this.drawBetPoint(-10);});
-        this.betText = this.add.text(270, 30, this.bet, {fontSize: 50});
+            .on('pointerdown', (pointer) => {
+                this.betMinusButton = {down:pointer.downTime, run:false};
+            })
+            .on('pointerup', (pointer) => {
+                if (pointer.upTime - pointer.downTime < 1000)
+                    this.drawBetPoint(-100);
+                this.betMinusButton = null;
+            });
+        this.betText = this.add.text(250, 30, this.bet, {fontSize: 50});
     }
+
+    /*
+    checkBet(event) {
+        if (this.checkBetTimer) {
+            clearTimeout(this.checkBetTimer);
+        }
+
+        this.checkBetTimer = setTimeout((game) => {
+            let v = game.input.value;
+            v = Math.min(game.betMax, v);
+            v = Math.min(game.points, v);
+            v = Math.max(game.betMin, v);
+            game.input.value = v;
+        }, 1000, this);
+    }
+    */
 
     drawBetPoint(bet) {
         if (this.start) return;
@@ -307,7 +439,7 @@ export class MainScene extends Phaser.Scene {
         this.bet += bet;
         this.bet = Math.min(this.bet, this.betMax);
         this.bet = Math.max(this.bet, this.betMin);
-        this.bet = Math.min(this.bet, Math.floor(this.points / 10) * 10);
+        this.bet = Math.min(this.bet, Math.floor(this.points / 100) * 100);
         this.betText.setText(this.bet);
     }
 
@@ -317,5 +449,13 @@ export class MainScene extends Phaser.Scene {
             .on('pointerdown', () => {
                 this.music.mute = !this.music.mute;
             });
+    }
+
+    goNext() {
+        if (this.isExpert) {
+            location.href = gameConfig.url + '?mode=expert&bet=' + this.bet;
+        } else {
+            location.href = gameConfig.url + '?mode=normal';
+        }
     }
 }

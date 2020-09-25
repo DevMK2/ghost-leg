@@ -2,7 +2,7 @@
 export const GAME_WIDTH = 600;
 export const GAME_HEIGHT = 800;
 
-export const ROW = 10;
+export const ROW = 15;
 export const COL = 3;
 
 export const LADDER_MARGIN = 200;
@@ -32,8 +32,11 @@ export const ASSETS_KEY = {
     stone: 'STONE',
     help: ['HELP_1', 'HELP_2', 'HELP_3'],
     sound: ['SOUND_ON', 'SOUND_OFF'],
-    bgm: 'BGM',
+    chance: 'CHANCE',
     soundOnOff: 'BUTTON_SOUND',
+    myPoint: 'MY_POINT',
+
+    bgm: 'BGM',
     clickSound: 'CLICK_SOUND',
     rocketSound: 'ROCKET_SOUND',
 };

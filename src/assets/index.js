@@ -16,6 +16,9 @@ import input from './input.png';
 import stone from './stone.png';
 import help from './help.png';
 import soundOnOff from './sound_onoff.png';
+import chance from './chance.png';
+import myPoint from './mypoint.png';
+
 import soundFile from './main.mp3';
 import clickSound from './click.mp3';
 import rocketSound from './rocket.mp3';
@@ -39,6 +42,9 @@ export {
     stone,
     help,
     soundOnOff,
+    chance,
+    myPoint,
+    
     soundFile,
     clickSound,
     rocketSound,

@@ -9,6 +9,9 @@ const config = {
     height: 800,
     autoFocus: true,
     disableContextMenu: false,
+    dom: {
+        createContainer: true
+    },
     scale: {
         mode: Phaser.Scale.FIT,
         autoCenter: Phaser.Scale.CENTER_BOTH
